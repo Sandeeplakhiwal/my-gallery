@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Document, Schema, Types } from "mongoose";
 import Validator from "validator";
 import { hash, compare } from "bcrypt-ts";
 import jwt from "jsonwebtoken";
@@ -14,7 +14,7 @@ export interface IUser extends Document {
   email: string;
   password: string;
   avatar: IAvatar;
-  posts: IPost[];
+  posts: string[];
   generateToken: () => Promise<string>;
   comparePassword: (password: string) => Promise<Boolean>;
 }

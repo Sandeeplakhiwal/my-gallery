@@ -35,17 +35,21 @@ import cloudinary from "cloudinary";
 import { User } from "../models/user.model.js";
 import { Post } from "../models/post.model.js";
 import ErrorHandler from "../utils/errorHandler.js";
+import { catchAsyncError } from "../middleware/catchAsyncError.js";
 export const createPost = (req, res, next) =>
   __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     if (!req.file) {
-      return next(new ErrorHandler("Please enter all fields", 400));
+      return next(new ErrorHandler("Please enter image file", 400));
+    }
+    if (!req.body.title) {
+      return next(new ErrorHandler("Please enter post title", 400));
     }
     const myCloud = yield cloudinary.v2.uploader.upload(req.file.path, {
       folder: "gallery",
     });
     const newPostData = {
-      caption: req.body.caption ? req.body.caption : "",
+      title: req.body.title,
       image: {
         public_id: myCloud.public_id,
         url: myCloud.secure_url,
@@ -71,3 +75,35 @@ export const createPost = (req, res, next) =>
       message: "Post created.",
     });
   });
+export const deletePost = catchAsyncError((req, res, next) =>
+  __awaiter(void 0, void 0, void 0, function* () {
+    var _c;
+    const { pId } = req.params;
+    if (!pId) return next(new ErrorHandler("Please provide post id", 400));
+    const post = yield Post.findById(pId);
+    if (!post)
+      return next(new ErrorHandler("Post not found with given id", 404));
+    if (
+      post.owner.toString() !==
+      ((_c = req.user) === null || _c === void 0 ? void 0 : _c._id.toString())
+    ) {
+      return next(new ErrorHandler("Unauthorised", 401));
+    }
+    // Remove post from db
+    yield post.deleteOne();
+    // Remove post from user's posts array
+    const user = req.user;
+    if (user) {
+      const indexOfPostId =
+        user === null || user === void 0 ? void 0 : user.posts.indexOf(pId);
+      user.posts.splice(indexOfPostId, 1);
+      yield user.save();
+    }
+    // Destory post from cloudinary
+    yield cloudinary.v2.uploader.destroy(post.image.public_id);
+    return res.status(200).json({
+      success: true,
+      message: "Post deleted successfully",
+    });
+  })
+);

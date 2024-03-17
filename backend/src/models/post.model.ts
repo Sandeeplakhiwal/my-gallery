@@ -6,12 +6,17 @@ interface IPostImage {
 }
 
 export interface IPost extends Document {
+  title: string;
   image: IPostImage;
   owner: Types.ObjectId;
   createdAt: Date;
 }
 
 const postSchema = new mongoose.Schema<IPost>({
+  title: {
+    type: String,
+    required: true,
+  },
   image: {
     public_id: {
       type: String,

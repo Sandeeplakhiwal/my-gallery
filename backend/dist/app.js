@@ -17,6 +17,12 @@ app.use(Cors({
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
 }));
+// Handling uncaught exception
+process.on("uncaughtException", (err) => {
+    console.log("Error: ", err.message);
+    console.log("Shutting down the server due to uncaught exception");
+    process.exit(1);
+});
 // Connecting to the databse
 connectDB();
 // Configuring Cloudinary
@@ -37,6 +43,13 @@ app.use("/api/v1", AuthRoutes);
 app.use("/api/v1", PostRoutes);
 // Using middleware for exception handling
 app.use(ErrorMiddleware);
-app.listen(process.env.PORT, () => {
+const server = app.listen(process.env.PORT, () => {
     return console.log(`Express is listening at http://localhost:${process.env.PORT}`);
+});
+process.on("unhandledRejection", (err) => {
+    console.log("Error: ", err.message);
+    console.log("Shutting down the server due to Unhandled Promise Rejection");
+    server.close(() => {
+        process.exit(1);
+    });
 });
