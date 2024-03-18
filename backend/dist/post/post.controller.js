@@ -75,9 +75,17 @@ export const createPost = (req, res, next) =>
       message: "Post created.",
     });
   });
-export const deletePost = catchAsyncError((req, res, next) =>
+export const getUserPosts = catchAsyncError((req, res, next) =>
   __awaiter(void 0, void 0, void 0, function* () {
     var _c;
+    const user = (_c = req.user) === null || _c === void 0 ? void 0 : _c._id;
+    const posts = yield Post.find({ owner: user });
+    return res.status(200).json(posts);
+  })
+);
+export const deletePost = catchAsyncError((req, res, next) =>
+  __awaiter(void 0, void 0, void 0, function* () {
+    var _d;
     const { pId } = req.params;
     if (!pId) return next(new ErrorHandler("Please provide post id", 400));
     const post = yield Post.findById(pId);
@@ -85,7 +93,7 @@ export const deletePost = catchAsyncError((req, res, next) =>
       return next(new ErrorHandler("Post not found with given id", 404));
     if (
       post.owner.toString() !==
-      ((_c = req.user) === null || _c === void 0 ? void 0 : _c._id.toString())
+      ((_d = req.user) === null || _d === void 0 ? void 0 : _d._id.toString())
     ) {
       return next(new ErrorHandler("Unauthorised", 401));
     }

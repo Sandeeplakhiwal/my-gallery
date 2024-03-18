@@ -1,4 +1,11 @@
-import { Box, Button, Container, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Container,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { FormEvent, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import * as PageRoutes from "../constants/routes";
@@ -6,7 +13,7 @@ import { useFormik } from "formik";
 import { LoginSchema } from "../schema";
 import toast from "react-hot-toast";
 import { isAxiosError } from "axios";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { LoginApi } from "../utils/apis";
 
 function LoginPage() {
@@ -29,15 +36,18 @@ function LoginPage() {
   };
 
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const {
     data: LoginData,
     error: LoginError,
     mutateAsync,
+    isPending,
   } = useMutation({
     mutationKey: ["login"],
     mutationFn: LoginApi,
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user"] });
       navigate(PageRoutes.HOME);
       toast.success("Logged in successfully");
     },
@@ -127,7 +137,11 @@ function LoginPage() {
               type="submit"
               style={{ marginTop: "1rem" }}
             >
-              Login
+              {isPending ? (
+                <CircularProgress sx={{ color: "white" }} />
+              ) : (
+                "Log In"
+              )}
             </Button>
           </form>
         </Box>

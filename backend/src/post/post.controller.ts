@@ -52,6 +52,14 @@ export const createPost = async (
   });
 };
 
+export const getUserPosts = catchAsyncError(
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
+    const user = req.user?._id;
+    const posts = await Post.find({ owner: user });
+    return res.status(200).json(posts);
+  }
+);
+
 export const deletePost = catchAsyncError(
   async (req: AuthRequest, res: Response, next: NextFunction) => {
     const { pId } = req.params;

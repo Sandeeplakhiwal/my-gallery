@@ -64,7 +64,7 @@ export const Logout = catchAsyncError(async (req: Request, res: Response) => {
 // Get User Profile
 export const getUserProfile = catchAsyncError(
   async (req: AuthRequest, res: Response) => {
-    const user = await req.user;
+    const user = await User.findById(req.user?._id).populate("posts");
     return res.status(200).json(user);
   }
 );

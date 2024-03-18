@@ -1,4 +1,11 @@
-import { Box, Button, Container, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Container,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { FormEvent, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import * as PageRoutes from "../constants/routes";
@@ -8,6 +15,8 @@ import { useFormik } from "formik";
 import { SignupSchema } from "../schema";
 import toast from "react-hot-toast";
 import { isAxiosError } from "axios";
+import { loadUser } from "../redux/slices/userSlice";
+import { useDispatch } from "react-redux";
 
 function SignupPage() {
   useEffect(() => {
@@ -30,15 +39,18 @@ function SignupPage() {
   };
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const {
     data: SignupData,
     error: SignupError,
     mutateAsync,
+    isPending,
   } = useMutation({
     mutationKey: ["signup"],
     mutationFn: SignupApi,
-    onSuccess: () => {
+    onSuccess: (data) => {
+      dispatch(loadUser(data.data?.user));
       navigate(PageRoutes.HOME);
       toast.success("Registered successfully");
     },
@@ -144,7 +156,11 @@ function SignupPage() {
             type="submit"
             style={{ marginTop: "1rem" }}
           >
-            Signup
+            {isPending ? (
+              <CircularProgress sx={{ color: "white" }} />
+            ) : (
+              "Sign Up"
+            )}
           </Button>
         </form>
       </Box>

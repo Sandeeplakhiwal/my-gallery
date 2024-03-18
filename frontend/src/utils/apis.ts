@@ -22,3 +22,31 @@ export const LoginApi = (formData: { email: string; password: string }) => {
     withCredentials: true,
   });
 };
+
+export const authApi = () => {
+  return axios.get(`${Server}/me`, {
+    withCredentials: true,
+  });
+};
+
+export const createNewPostApi = (formData: FormData) => {
+  console.log({ formData });
+  return axios.post(`${Server}/post/create`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+    withCredentials: true,
+  });
+};
+
+export const deletePostApi = (id: string) => {
+  return axios.delete(`${Server}/post/${id}`, {
+    withCredentials: true,
+  });
+};
+
+export const LogoutApi = () => {
+  return axios.get(`${Server}/auth/logout`, {
+    withCredentials: true,
+  });
+};

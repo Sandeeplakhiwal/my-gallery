@@ -93,7 +93,10 @@ export const Logout = catchAsyncError((req, res) =>
 // Get User Profile
 export const getUserProfile = catchAsyncError((req, res) =>
   __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield req.user;
+    var _a;
+    const user = yield User.findById(
+      (_a = req.user) === null || _a === void 0 ? void 0 : _a._id
+    ).populate("posts");
     return res.status(200).json(user);
   })
 );
