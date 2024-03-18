@@ -1,16 +1,31 @@
-import express from "express";
-import { isAuthenticated } from "../middleware/auth.middleware.js";
-import { createPost, deletePost, getUserPosts } from "./post.controller.js";
-import multer from "multer";
-const router = express.Router();
+"use strict";
+var __importDefault =
+  (this && this.__importDefault) ||
+  function (mod) {
+    return mod && mod.__esModule ? mod : { default: mod };
+  };
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const auth_middleware_1 = require("../middleware/auth.middleware.js");
+const post_controller_1 = require("./post.controller.js");
+const multer_1 = __importDefault(require("multer"));
+const router = express_1.default.Router();
 // Setting up multer middlware to handle file upload
-const upload = multer({ dest: "uploads/" });
+const upload = (0, multer_1.default)({ dest: "uploads/" });
 router.post(
   "/post/create",
-  isAuthenticated,
+  auth_middleware_1.isAuthenticated,
   upload.single("image"),
-  createPost
+  post_controller_1.createPost
 );
-router.get("/posts", isAuthenticated, getUserPosts);
-router.delete("/post/:pId", isAuthenticated, deletePost);
-export default router;
+router.get(
+  "/posts",
+  auth_middleware_1.isAuthenticated,
+  post_controller_1.getUserPosts
+);
+router.delete(
+  "/post/:pId",
+  auth_middleware_1.isAuthenticated,
+  post_controller_1.deletePost
+);
+exports.default = router;

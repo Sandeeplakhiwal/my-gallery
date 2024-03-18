@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter =
   (this && this.__awaiter) ||
   function (thisArg, _arguments, P, generator) {
@@ -31,50 +32,70 @@ var __awaiter =
       step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
   };
-import { catchAsyncError } from "../middleware/catchAsyncError.js";
-import ErrorHandler from "../utils/errorHandler.js";
-import { User } from "../models/user.model.js";
-import { sendToken } from "../utils/sendToken.js";
-export const Signup = catchAsyncError((req, res, next) =>
+var __importDefault =
+  (this && this.__importDefault) ||
+  function (mod) {
+    return mod && mod.__esModule ? mod : { default: mod };
+  };
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getUserProfile =
+  exports.Logout =
+  exports.Login =
+  exports.Signup =
+    void 0;
+const catchAsyncError_1 = require("../middleware/catchAsyncError.js");
+const errorHandler_1 = __importDefault(require("../utils/errorHandler.js"));
+const user_model_1 = require("../models/user.model.js");
+const sendToken_1 = require("../utils/sendToken.js");
+exports.Signup = (0, catchAsyncError_1.catchAsyncError)((req, res, next) =>
   __awaiter(void 0, void 0, void 0, function* () {
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
-      return next(new ErrorHandler("Please enter all fields", 400));
+      return next(new errorHandler_1.default("Please enter all fields", 400));
     }
-    let user = yield User.findOne({ email });
+    let user = yield user_model_1.User.findOne({ email });
     if (user) {
       return next(
-        new ErrorHandler("User already exist with this email address", 409)
+        new errorHandler_1.default(
+          "User already exist with this email address",
+          409
+        )
       );
     }
-    user = yield User.create({
+    user = yield user_model_1.User.create({
       name,
       email,
       password,
     });
-    return sendToken(res, user, "Registered successfully", 201);
+    return (0,
+    sendToken_1.sendToken)(res, user, "Registered successfully", 201);
   })
 );
 // Login Controller
-export const Login = catchAsyncError((req, res, next) =>
+exports.Login = (0, catchAsyncError_1.catchAsyncError)((req, res, next) =>
   __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;
     if (!email || !password) {
-      return next(new ErrorHandler("Please enter all fields", 400));
+      return next(new errorHandler_1.default("Please enter all fields", 400));
     }
-    let user = yield User.findOne({ email }).select("+password");
+    let user = yield user_model_1.User.findOne({ email }).select("+password");
     if (!user) {
-      return next(new ErrorHandler("Incorrect email or password", 401));
+      return next(
+        new errorHandler_1.default("Incorrect email or password", 401)
+      );
     }
     const isMatch = yield user.comparePassword(password);
     if (!isMatch) {
-      return next(new ErrorHandler("Incorrect email or password", 401));
+      return next(
+        new errorHandler_1.default("Incorrect email or password", 401)
+      );
     }
-    return sendToken(res, user, `Welcome back ${user.name}`, 200);
+    return (0,
+    sendToken_1.sendToken)(res, user, `Welcome back ${user.name}`, 200);
   })
 );
 // Logout Controller
-export const Logout = catchAsyncError((req, res) =>
+exports.Logout = (0, catchAsyncError_1.catchAsyncError)((req, res) =>
   __awaiter(void 0, void 0, void 0, function* () {
     res
       .status(200)
@@ -91,10 +112,10 @@ export const Logout = catchAsyncError((req, res) =>
   })
 );
 // Get User Profile
-export const getUserProfile = catchAsyncError((req, res) =>
+exports.getUserProfile = (0, catchAsyncError_1.catchAsyncError)((req, res) =>
   __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    const user = yield User.findById(
+    const user = yield user_model_1.User.findById(
       (_a = req.user) === null || _a === void 0 ? void 0 : _a._id
     ).populate("posts");
     return res.status(200).json(user);
