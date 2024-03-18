@@ -21,7 +21,7 @@ app.use(express_1.default.urlencoded({ extended: true }));
 app.use((0, cookie_parser_1.default)());
 app.use(
   (0, cors_1.default)({
-    origin: "http://localhost:5173",
+    origin: "https://mygallery-eta.vercel.app",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
   })
