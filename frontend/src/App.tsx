@@ -31,6 +31,8 @@ function App() {
   } = useQuery({
     queryKey: ["user"],
     queryFn: authApi,
+    refetchOnWindowFocus: false,
+    retry: 1,
   });
   useEffect(() => {
     if (authData && isSuccess) {
